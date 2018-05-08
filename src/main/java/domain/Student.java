@@ -1,4 +1,4 @@
-
+package domain;
 
 public class Student extends Person {
 	private int grade;
@@ -28,6 +28,9 @@ public class Student extends Person {
 	public String toString() {
 		return "Student informaition [Grade: " + grade + ", " + super.toString() + " ]";
 	}
+
+
+
 	
 	
 	

@@ -1,4 +1,4 @@
-
+package domain;
 
 public class Administrator extends Person {
 	private String userName;
@@ -25,6 +25,8 @@ public class Administrator extends Person {
 	public void setPassword(String password) {
 		this.password = password;
 	}
+
+
 	
 	
 }

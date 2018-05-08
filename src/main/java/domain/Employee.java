@@ -1,3 +1,4 @@
+package domain;
 
 public class Employee extends Person {
 	private int salary;
@@ -23,5 +24,7 @@ public class Employee extends Person {
 	public String toString() {
 		return "Employee informaition [Salary: " + salary + ", " + super.toString() + " ]";
 	}
+
+	
 	
 }
