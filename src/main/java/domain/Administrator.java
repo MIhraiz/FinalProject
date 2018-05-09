@@ -4,6 +4,12 @@ public class Administrator extends Person {
 	private String userName;
 	private String password;
 	
+	
+	
+	public Administrator() {
+		super();
+	}
+
 	public Administrator(String name, int age, String userName, String password) {
 		super(name, age);
 		this.userName = userName;
@@ -26,7 +32,7 @@ public class Administrator extends Person {
 		this.password = password;
 	}
 
-
+	
 	
 	
 }

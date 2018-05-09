@@ -1,5 +1,7 @@
 package domain;
 
+import javax.swing.JOptionPane;
+
 public abstract class Security {
 	
 	public static String encrypt (String s) {
@@ -20,5 +22,8 @@ public abstract class Security {
 		
 	}
 	
+	public static void parseHandeling() {
+		JOptionPane.showMessageDialog(null, "Invalid number input, pleas enter integers only ♥");
+	}
 	
 }

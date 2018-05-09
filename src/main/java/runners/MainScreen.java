@@ -9,9 +9,11 @@ import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,6 +25,8 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.URL;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import javax.swing.JComboBox;
@@ -53,23 +57,28 @@ public class MainScreen {
 	private JTextField txtCityS;
 	private JTextField txtHouseNumberS;
 	private JTextField txtSearchName;
-	private JTextField txtNameSS;
-	private JTextField txtAgeSS;
-	private JTextField txtCitySS;
-	private JTextField txtStreetNameSS;
-	private JTextField txtHouseNum;
-	private JTextField txtGradeSS;
-	private JTextField txtSalarySS;
-	
-	
-	
+	private static JTextField txtNameSS;
+	private static JTextField txtAgeSS;
+	private static JTextField txtCitySS;
+	private static JTextField txtStreetNameSS;
+	private static JTextField txtHouseNumberSS;
+	private static JTextField txtGradeSS;
+	private static JTextField txtSalarySS;
 	
 	
 	private static ArrayList<Administrator> admins = new ArrayList<Administrator>();
-	private static ArrayList<Student> students = new ArrayList<Student>();
-	private static ArrayList<Employee> employees = new ArrayList<Employee>();
+	private static ArrayList<Person> students = new ArrayList<>();
+	private static ArrayList<Person> employees = new ArrayList<>();
+	private static ArrayList<Person> matches = new ArrayList<>();
+	private static int matchesNum;
 	private static ObjectMapper om = new ObjectMapper();
 	private JPasswordField txtPassword;
+	private JTextField txtSalaryReport;
+	private JTextField txtGradeReport;
+	
+	private static File adminsFile = new File("Admins.txt");
+	private static File studentsFile = new File("Students.txt");
+	private static File employeesFile = new File("Employees.txt");
 
 	/**
 	 * Launch the application.
@@ -79,9 +88,7 @@ public class MainScreen {
 		
 		
 		
-		File adminsFile = new File("Admins.txt");
-		File studentsFile = new File("Students.txt");
-		File employeesFile = new File("Employees.txt");
+		
 		
 		//Read the files -- I know it can be one interface method but this is easier :P 
 		if(adminsFile.exists()) {
@@ -239,9 +246,25 @@ public class MainScreen {
 		JButton btnAddAdmin = new JButton("Add");
 		btnAddAdmin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Administrator admin = new Administrator(txtNameA.getText(),Integer.parseInt(txtAgeA.getText()),Security.encrypt(txtUsername.getText()),Security.encrypt(txtPassword.getText()));
-				admin.setAddress(new Address(txtStreetNameA.getText(),txtHouseNumberA.getText(),txtCityA.getText()));
-				admins.add(admin);
+				
+				try {
+					Administrator admin = new Administrator(txtNameA.getText(),Integer.parseInt(txtAgeA.getText()),Security.encrypt(txtUsername.getText()),Security.encrypt(txtPassword.getText()));
+					admin.setAddress(new Address(txtStreetNameA.getText(),txtHouseNumberA.getText(),txtCityA.getText()));
+					admins.add(admin);
+					
+				} catch (NumberFormatException e) {
+					Security.parseHandeling();
+				}
+				
+				
+				
+				txtNameA.setText(null);
+				txtAgeA.setText(null);
+				txtCityA.setText(null);
+				txtHouseNumberA.setText(null);
+				txtStreetNameA.setText(null);
+				txtUsername.setText(null);
+				txtPassword.setText(null);
 				
 				
 			}
@@ -326,9 +349,21 @@ public class MainScreen {
 		JButton btnAddEmployee = new JButton("Add");
 		btnAddEmployee.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Employee employee = new Employee(txtNameE.getText(),Integer.parseInt(txtAgeE.getText()),Integer.parseInt(txtSalary.getText()));
-				employee.setAddress(new Address(txtStreetNameE.getText(),txtHouseNumberE.getText(),txtCityE.getText()));
-				employees.add(employee);
+				try {
+					Employee employee = new Employee(txtNameE.getText(),Integer.parseInt(txtAgeE.getText()),Integer.parseInt(txtSalary.getText()));
+					employee.setAddress(new Address(txtStreetNameE.getText(),txtHouseNumberE.getText(),txtCityE.getText()));
+					employees.add(employee);
+				} catch (NumberFormatException e) {
+					Security.parseHandeling();
+				}
+				
+				
+				txtNameE.setText(null);
+				txtAgeE.setText(null);
+				txtCityE.setText(null);
+				txtHouseNumberE.setText(null);
+				txtStreetNameE.setText(null);
+				txtSalary.setText(null);
 			}
 		});
 		btnAddEmployee.setBounds(246, 282, 127, 61);
@@ -407,9 +442,25 @@ public class MainScreen {
 		JButton btnAddStudent = new JButton("Add");
 		btnAddStudent.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Student student = new Student(txtNameE.getText(),Integer.parseInt(txtAgeE.getText()),Integer.parseInt(txtGrade.getText()));
-				student.setAddress(new Address(txtStreetNameS.getText(),txtHouseNumberS.getText(),txtCityS.getText()));
-				students.add(student);
+				
+				try {
+					
+					Student student = new Student(txtNameS.getText(),Integer.parseInt(txtAgeS.getText()),Integer.parseInt(txtGrade.getText()));
+					student.setAddress(new Address(txtStreetNameS.getText(),txtHouseNumberS.getText(),txtCityS.getText()));
+					students.add(student);
+					
+				} catch (NumberFormatException e1) {
+					Security.parseHandeling();
+				}
+				
+				
+				
+				txtNameS.setText(null);
+				txtAgeS.setText(null);
+				txtCityS.setText(null);
+				txtHouseNumberS.setText(null);
+				txtStreetNameS.setText(null);
+				txtGrade.setText(null);
 			}
 		});
 		btnAddStudent.setBounds(243, 279, 127, 61);
@@ -417,20 +468,148 @@ public class MainScreen {
 		
 		JPanel panel_3 = new JPanel();
 		tabbedPane.addTab("Reports", null, panel_3, null);
+		panel_3.setLayout(null);
+		
+		JTabbedPane tabbedPane_1 = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane_1.setBounds(0, 0, 607, 386);
+		panel_3.add(tabbedPane_1);
+		
+		JPanel panel_5 = new JPanel();
+		tabbedPane_1.addTab("Salary Report", null, panel_5, null);
+		panel_5.setLayout(null);
+		
+		txtSalaryReport = new JTextField();
+		txtSalaryReport.setColumns(10);
+		txtSalaryReport.setBounds(341, 79, 127, 22);
+		panel_5.add(txtSalaryReport);
+		
+		JButton btnPrintSR = new JButton("Print Report");
+		btnPrintSR.setBounds(341, 190, 127, 61);
+		panel_5.add(btnPrintSR);
+		
+		JLabel lblSalaryReport = new JLabel("Salary Report");
+		lblSalaryReport.setHorizontalAlignment(SwingConstants.CENTER);
+		lblSalaryReport.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblSalaryReport.setBounds(127, 75, 127, 29);
+		panel_5.add(lblSalaryReport);
+		
+		JButton btnSearchSR = new JButton("Search");
+		btnSearchSR.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				int SalaryReport;
+				File outFile = new File("Salaries Report.txt");
+				PrintWriter printer = null;
+				
+				try {
+					SalaryReport =Integer.parseInt(txtSalaryReport.getText());
+					printer = new PrintWriter(outFile);
+					
+					for(Person e: employees) {
+						if(((Employee)e).getSalary() >= SalaryReport) {
+							printer.println(((Employee)e).toString());
+						}
+					
+					}
+				} catch (NumberFormatException e) {
+					Security.parseHandeling();
+				} catch (FileNotFoundException e) {
+				}
+				
+				printer.flush();
+				printer.close();
+			}
+		});
+		btnSearchSR.setBounds(127, 190, 127, 61);
+		panel_5.add(btnSearchSR);
+		
+		JPanel panel_6 = new JPanel();
+		tabbedPane_1.addTab("Grade Report", null, panel_6, null);
+		panel_6.setLayout(null);
+		
+		txtGradeReport = new JTextField();
+		txtGradeReport.setColumns(10);
+		txtGradeReport.setBounds(341, 80, 127, 22);
+		panel_6.add(txtGradeReport);
+		
+		JButton btnSearchGR = new JButton("Search");
+		btnSearchGR.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				
+				int GradeReport;
+				File outFile = new File("Grades Report.txt");
+				PrintWriter printer = null;
+				
+				try {
+					GradeReport = Integer.parseInt(txtGradeReport.getText());
+					printer = new PrintWriter(outFile);
+					
+					for(Person s: students) {
+						if(((Student)s).getGrade() >= GradeReport) {
+							printer.println(((Student)s).toString());
+						}
+					
+					}
+				} catch (NumberFormatException e) {
+					Security.parseHandeling();
+				} catch (FileNotFoundException e) {
+				}
+				
+				printer.flush();
+				printer.close();
+				
+				
+			}
+		});
+		btnSearchGR.setBounds(127, 190, 127, 61);
+		panel_6.add(btnSearchGR);
+		
+		JLabel lblGradeReport = new JLabel("Grade Report");
+		lblGradeReport.setHorizontalAlignment(SwingConstants.CENTER);
+		lblGradeReport.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblGradeReport.setBounds(127, 76, 127, 29);
+		panel_6.add(lblGradeReport);
+		
+		JButton btnPrintGR = new JButton("Print Report");
+		btnPrintGR.setBounds(341, 190, 127, 61);
+		panel_6.add(btnPrintGR);
 		
 		JPanel panel_4 = new JPanel();
 		tabbedPane.addTab("Search", null, panel_4, null);
 		panel_4.setLayout(null);
 		
-		JCheckBox chckbxStudents = new JCheckBox("Students");
+		final JCheckBox chckbxStudents = new JCheckBox("Students");
+		chckbxStudents.setSelected(true);
 		chckbxStudents.setBounds(57, 146, 113, 25);
 		panel_4.add(chckbxStudents);
 		
-		JCheckBox chckbxEmployees = new JCheckBox("Employees");
+		final JCheckBox chckbxEmployees = new JCheckBox("Employees");
+		chckbxEmployees.setSelected(true);
 		chckbxEmployees.setBounds(57, 176, 113, 25);
 		panel_4.add(chckbxEmployees);
 		
+		
 		JButton btnSearch = new JButton("Search");
+		btnSearch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				matchesNum=0;
+				if(chckbxStudents.isSelected() && !chckbxEmployees.isSelected()) {
+					matches = Search.search(students, txtSearchName.getText());
+					print(matches.get(matchesNum));
+					matchesNum++;
+					
+				}else if(!chckbxStudents.isSelected() && chckbxEmployees.isSelected()) {
+					matches = Search.search(employees, txtSearchName.getText());
+					print(matches.get(matchesNum));	
+					matchesNum++;
+				}else {
+					matches = Search.search(students, employees, txtSearchName.getText());
+					print(matches.get(matchesNum));
+					matchesNum++;
+				}
+			}
+		});
 		btnSearch.setBounds(43, 252, 127, 61);
 		panel_4.add(btnSearch);
 		
@@ -472,12 +651,12 @@ public class MainScreen {
 		txtStreetNameSS.setBounds(382, 187, 127, 22);
 		panel_4.add(txtStreetNameSS);
 		
-		txtHouseNum = new JTextField();
-		txtHouseNum.setHorizontalAlignment(SwingConstants.CENTER);
-		txtHouseNum.setText("House number");
-		txtHouseNum.setColumns(10);
-		txtHouseNum.setBounds(382, 225, 127, 22);
-		panel_4.add(txtHouseNum);
+		txtHouseNumberSS = new JTextField();
+		txtHouseNumberSS.setHorizontalAlignment(SwingConstants.CENTER);
+		txtHouseNumberSS.setText("House number");
+		txtHouseNumberSS.setColumns(10);
+		txtHouseNumberSS.setBounds(382, 225, 127, 22);
+		panel_4.add(txtHouseNumberSS);
 		
 		txtGradeSS = new JTextField();
 		txtGradeSS.setHorizontalAlignment(SwingConstants.CENTER);
@@ -494,11 +673,111 @@ public class MainScreen {
 		panel_4.add(txtSalarySS);
 		
 		JButton btnNext = new JButton("Next");
+		btnNext.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if(matches.size()!= 0) {
+					if(matchesNum == 0) {
+						matchesNum = matches.size()-1;
+					}else if(matchesNum == matches.size()){
+						matchesNum=0;
+					}
+					print(matches.get(matchesNum));
+					matchesNum++;
+				}
+				
+			}
+		});
 		btnNext.setBounds(245, 118, 93, 46);
 		panel_4.add(btnNext);
 		
 		JButton btnSave = new JButton("Save");
+		btnSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(matches.get(matchesNum-1) instanceof Student) {
+					
+					int i = Search.search(students, matches.get(matchesNum-1));
+					Student student = new Student(txtNameSS.getText(),Integer.parseInt(txtAgeSS.getText()),Integer.parseInt(txtGradeSS.getText()));
+					student.setAddress(new Address(txtStreetNameSS.getText(),txtHouseNumberSS.getText(),txtCitySS.getText()));
+					students.set(i, student);
+				}else {
+					int i = Search.search(employees, matches.get(matchesNum-1));
+					Employee employee = new Employee(txtNameSS.getText(),Integer.parseInt(txtAgeSS.getText()),Integer.parseInt(txtSalarySS.getText()));
+					employee.setAddress(new Address(txtStreetNameSS.getText(),txtHouseNumberSS.getText(),txtCitySS.getText()));
+					employees.set(i, employee);
+				}
+				
+				
+			}
+		});
 		btnSave.setBounds(245, 204, 93, 46);
 		panel_4.add(btnSave);
+		
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		frame.addWindowListener(new java.awt.event.WindowAdapter() {
+		    @Override
+		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+		    	
+		    	frame = new JFrame("Exit");
+				if(JOptionPane.showConfirmDialog(frame, "Confirm if you want to exit", "Login Systems", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_NO_OPTION) {
+					
+					PrintWriter printer = null;
+					String jsonArray;
+					
+					try {
+						
+						printer = new PrintWriter(adminsFile);
+						jsonArray = om.writeValueAsString(admins);
+						printer.println(jsonArray);
+						printer.flush();
+						printer.close();
+						
+						printer = new PrintWriter(employeesFile);
+						jsonArray = om.writeValueAsString(employees);
+						printer.println(jsonArray);
+						printer.flush();
+						printer.close();
+						
+						printer = new PrintWriter(studentsFile);
+						jsonArray = om.writeValueAsString(students);
+						printer.println(jsonArray);
+						printer.flush();
+						printer.close();
+						
+					} catch (FileNotFoundException e) {
+					} catch (JsonProcessingException e) {
+					}
+					printer.flush();
+					printer.close();
+					System.exit(0);
+				}
+				
+		    }
+		});
 	}
+	
+	public static void print(Person p) {
+		if(p instanceof Student) {
+			Student s = (Student) p;
+			txtNameSS.setText(s.getName());
+			txtAgeSS.setText(s.getAge()+"");
+			txtCitySS.setText(s.getAddress().getCity());
+			txtHouseNumberSS.setText(s.getAddress().getHouseNumber());
+			txtStreetNameSS.setText(s.getAddress().getStreetName());
+			txtGradeSS.setText(s.getGrade()+"");
+			txtSalarySS.setText("unknown");
+		}else {
+			Employee e = (Employee) p;
+			txtNameSS.setText(e.getName());
+			txtAgeSS.setText(e.getAge()+"");
+			txtCitySS.setText(e.getAddress().getCity());
+			txtHouseNumberSS.setText(e.getAddress().getHouseNumber());
+			txtStreetNameSS.setText(e.getAddress().getStreetName());
+			txtGradeSS.setText("unknown");
+			txtSalarySS.setText(e.getSalary()+"");
+		}
+		
+		
+		
+	}
+	
 }
