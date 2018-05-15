@@ -129,33 +129,23 @@ public class LoginSystem {
 							for(Administrator admin: admins) {
 								if(Security.decrypt(admin.getUserName()).equals(username) && Security.decrypt(admin.getPassword()).equals(password)) {
 									
+									frame.dispose();	
 									try {
 										MainScreen.main(null);
-									} catch (FileNotFoundException e1) {
+									} catch (FileNotFoundException e2) {
 									}
+								} else {
+									JOptionPane.showMessageDialog(null, "Invalid Username or Password, Pleas try again");
 								}
 							}
 						}
 					} else {
-						if("admin".equals(username) && "admin".equals(password)) {
-							
-							try {
-								MainScreen.main(null);
-							} catch (FileNotFoundException e1) {
-							}
-						}
+						defaultLogin(frame,username,password);
 					}
 					
 					
 				} else {
-					if("admin".equals(username) && "admin".equals(password)) {
-						
-							try {
-								MainScreen.main(null);
-							} catch (FileNotFoundException e1) {
-							}
-						
-					}
+					defaultLogin(frame,username,password);
 				}
 				
 				
@@ -175,7 +165,7 @@ public class LoginSystem {
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
 		    	
 		    	frame = new JFrame("Exit");
-				if(JOptionPane.showConfirmDialog(frame, "Confirm if you want to exit", "Login Systems", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_NO_OPTION) {
+				if(JOptionPane.showConfirmDialog(frame, "Confirm if you want to exit", "Login Systems", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
 				System.exit(0);
 				}
 				
@@ -183,6 +173,20 @@ public class LoginSystem {
 		});
 		
 		
+		
+	}
+	
+	public static void defaultLogin(JFrame frame,String username,String password) {
+		
+		if("admin".equals(username) && "admin".equals(password)) {
+			frame.dispose();	
+			try {
+				MainScreen.main(null);
+			} catch (FileNotFoundException e) {
+			}
+		} else {
+			JOptionPane.showMessageDialog(null, "Invalid Username or Password, Please try again");
+		}
 		
 	}
 }

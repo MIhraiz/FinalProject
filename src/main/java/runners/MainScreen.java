@@ -22,6 +22,7 @@ import java.awt.Font;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.awt.print.PrinterException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -34,7 +35,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JScrollBar;
 import javax.swing.JPasswordField;
 
-public class MainScreen {
+public class MainScreen extends JFrame {
 
 	private JFrame frame;
 	private final JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
@@ -65,7 +66,6 @@ public class MainScreen {
 	private static JTextField txtGradeSS;
 	private static JTextField txtSalarySS;
 	
-	
 	private static ArrayList<Administrator> admins = new ArrayList<Administrator>();
 	private static ArrayList<Person> students = new ArrayList<>();
 	private static ArrayList<Person> employees = new ArrayList<>();
@@ -85,9 +85,6 @@ public class MainScreen {
 	 * @throws FileNotFoundException 
 	 */
 	public static void main(String[] args) throws FileNotFoundException {
-		
-		
-		
 		
 		
 		//Read the files -- I know it can be one interface method but this is easier :P 
@@ -132,8 +129,6 @@ public class MainScreen {
 				}
 			}
 		}
-		
-		
 		
 		
 		EventQueue.invokeLater(new Runnable() {
@@ -484,6 +479,30 @@ public class MainScreen {
 		panel_5.add(txtSalaryReport);
 		
 		JButton btnPrintSR = new JButton("Print Report");
+		btnPrintSR.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Scanner in = null;
+				String print = "";
+				File f = new File("Salaries Report.txt");
+				if(f.exists()) {
+					try {
+						in = new Scanner(f);
+						while(in.hasNextLine())
+							print = print + in.nextLine() + "\n";
+						
+						txtSalaryReport.setText(print);
+						txtSalaryReport.print();
+						txtSalaryReport.setText(null);
+
+					} catch (FileNotFoundException e) {
+					} catch (PrinterException e) {
+					}
+					
+				} else {
+					JOptionPane.showMessageDialog(null, "There is no file to print.");
+				}
+			}
+		});
 		btnPrintSR.setBounds(341, 190, 127, 61);
 		panel_5.add(btnPrintSR);
 		
@@ -511,13 +530,17 @@ public class MainScreen {
 						}
 					
 					}
+					
+					printer.flush();
+					printer.close();
+					
 				} catch (NumberFormatException e) {
 					Security.parseHandeling();
 				} catch (FileNotFoundException e) {
 				}
 				
-				printer.flush();
-				printer.close();
+				
+				
 			}
 		});
 		btnSearchSR.setBounds(127, 190, 127, 61);
@@ -551,13 +574,16 @@ public class MainScreen {
 						}
 					
 					}
+					
+					printer.flush();
+					printer.close();
+					
 				} catch (NumberFormatException e) {
 					Security.parseHandeling();
 				} catch (FileNotFoundException e) {
 				}
 				
-				printer.flush();
-				printer.close();
+				
 				
 				
 			}
@@ -572,6 +598,30 @@ public class MainScreen {
 		panel_6.add(lblGradeReport);
 		
 		JButton btnPrintGR = new JButton("Print Report");
+		btnPrintGR.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Scanner in = null;
+				String print = "";
+				File f = new File("Grades Report.txt");
+				if(f.exists()) {
+					try {
+						in = new Scanner(f);
+						while(in.hasNextLine())
+							print = print + in.nextLine() + "\n";
+						
+						txtGradeReport.setText(print);
+						txtGradeReport.print();
+						txtGradeReport.setText(null);
+
+					} catch (FileNotFoundException e) {
+					} catch (PrinterException e) {
+					}
+					
+				} else {
+					JOptionPane.showMessageDialog(null, "There is no file to print.");
+				}
+			}
+		});
 		btnPrintGR.setBounds(341, 190, 127, 61);
 		panel_6.add(btnPrintGR);
 		
@@ -718,7 +768,7 @@ public class MainScreen {
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
 		    	
 		    	frame = new JFrame("Exit");
-				if(JOptionPane.showConfirmDialog(frame, "Confirm if you want to exit", "Login Systems", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_NO_OPTION) {
+				if(JOptionPane.showConfirmDialog(frame, "Confirm if you want to exit", "Login Systems", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
 					
 					PrintWriter printer = null;
 					String jsonArray;
